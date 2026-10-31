@@ -1,6 +1,8 @@
 # CSV validation and parser experiment — reconstructed requirements
 
-**Status:** Reviewed reconstructed requirements; proposed parser probe contract remains UNAPPROVED.
+**Status:** Reviewed reconstructed requirements, supplemented by subsequent owner-approved
+Checkpoint 2A decisions. ChatGPT and the owner have reviewed the revised implementation
+ZIP and approved the Checkpoint 2A implementation for commit and push.
 This is not a verbatim LLD transcript or a complete recovery of the original decisions.
 The original discussions were approved, but their full text was never published
 as canonical documents. Approval of those discussions does not imply approval of
@@ -20,8 +22,9 @@ The owner explicitly identified these two decisions:
 | LLD #61 | Establish a standalone Maven/JUnit 5 conformance experiment. |
 
 No exact requirement-to-decision mappings are assigned for LLD #48–#59.
-The sections below distinguish recovered approved requirements, known open
-questions, details missing from the reconstruction, and new proposals.
+The historical sections below retain the reconstructed reference and earlier proposal.
+The subsequent owner-approved decisions and current implementation notes at the end
+supersede the earlier unresolved questions and proposed API where explicitly stated.
 
 ## Recovered approved requirements
 
@@ -82,11 +85,15 @@ over warnings. `issuesTruncated` indicates incomplete diagnostics.
 - Production validation, REST APIs, frontend work, and database integration are
   outside this experiment. Existing production architecture remains unchanged.
 
-Checkpoint 1 provides the standalone Java release 21 Maven/JUnit 5 smoke harness.
+Checkpoint 1 provided the standalone Java release 21 Maven/JUnit 5 smoke harness.
 See the [experiment README](../../experiments/csv-parser-conformance/README.md).
-The probe contract, adapters, and CSV fixtures have not been implemented.
+The earlier reconstruction preceded the shared runner; current implementation
+scope is recorded below. Neither real parser adapter has been implemented.
 
-## Known unresolved architectural questions
+## Historical unresolved architectural questions
+
+These three questions describe the earlier reconstruction. Subsequent owner
+approvals below have now resolved them; they are not current open policy questions.
 
 1. **Unicode counting:** whether a character limit counts UTF-16 code units,
    Unicode code points, or another explicitly defined measure. The candidate field
@@ -100,20 +107,24 @@ The probe contract, adapters, and CSV fixtures have not been implemented.
    file-size boundaries. The explicitly specified 4 MiB logical-record candidate
    does not settle that separate convention.
 
-No proposal below resolves these questions. Assertions that depend on them remain
-pending a reviewed definition; library defaults do not establish DataOrbit policy.
+The definitions in the subsequent approvals govern the experiment. Library defaults
+do not establish DataOrbit policy, and implementation support still requires evidence.
 
 ## Details requiring confirmation because the original text is unavailable
 
 - The complete original decision text and precise requirement-to-decision
   attributions for LLD #48–#59.
-- The complete diagnostic code inventory beyond the recovered `NO_DATA_RECORDS`
-  warning, and any unspecified exact message or row-number conventions.
+- The complete original production diagnostic code inventory and any original
+  message/row-number conventions. The subsequently approved experiment-only code
+  inventory below does not claim to reconstruct the entire production inventory.
 
 These are gaps in the reconstruction, not claims that the original discussions
 left all of these topics undecided.
 
-## Proposed minimal experiment contract — UNAPPROVED and not implemented
+## Historical minimal experiment proposal — superseded for Checkpoint 2A
+
+This section records the earlier unapproved proposal, not a claim that every detail
+was subsequently approved. The current Reader-based SPI and scope are specified below.
 
 Conceptual operation: `probe(inputSource, options, recordSink) -> ProbeResult`.
 All types would belong only to the standalone experiment.
@@ -176,8 +187,96 @@ Adapter mappings need verification against the exact later-selected versions;
 changes to defaults and limit configuration. These library behaviors are evidence
 to record, not new DataOrbit architectural decisions.
 
-## Review gate
+## Subsequent owner-approved Checkpoint 2 decisions
 
-Review this reconstruction, the missing-policy questions, and the proposed contract
-before implementation. Do not add dependencies, implement the probe/adapters,
-choose a parser, or treat pending questions as settled through this document.
+The following ten rows consolidate the subsequent owner approvals and the
+Checkpoint 2A implementation instruction. A1–A10 are editorial labels for this
+document, not recovered LLD numbers or invented mappings for #48–#59.
+
+| Label | Approved decision |
+| --- | --- |
+| A1 | Shared strict UTF-8/initial-BOM decoding and header/shape validation; library-specific CSV tokenization, quote-unescaping, blank-record identification, and capability reporting. |
+| A2 | The shared runner owns source/session cleanup. Header is emitted as ordinal 1; ignored blanks consume no ordinals; delivered records are immutable and callbacks synchronous. Final result determines validity. |
+| A3 | Configurable diagnostic retention, candidate 100, prioritizes errors over warnings. Truncation means an observed issue was omitted or evicted, not merely that parsing stopped. Warning-only input scans to EOF. Messages are predefined and bounded. |
+| A4 | Content rejection is distinct from typed operational failures. Preserve the original failure and suppressed cleanup failures; cleanup cannot yield a false successful result. Unexpected infrastructure exceptions are not INVALID CSV. |
+| A5 | A header is mandatory; normalize strip → NFC → lowercase(Locale.ROOT) → NFC for duplicate detection without modifying emitted values. Invalid/duplicate headers stop. Invalid-width data records consume ordinals, report COLUMN_COUNT_MISMATCH, are not emitted, and scanning continues. Header-only CSV is VALID with NO_DATA_RECORDS WARNING. |
+| A6 | Count Unicode code points in parsed field values after quote-unescaping. Candidate maximum: 1,000,000. Safe early enforcement needs adapter-specific evidence. |
+| A7 | Count original UTF-8 source bytes per logical CSV record, including delimiters, quotes, doubled quotes, and embedded newlines. Exclude the terminating record separator, initial BOM, and ignored blank lines. Candidate maximum: 4,194,304 bytes, inclusive. |
+| A8 | Whole-file MB is decimal: 1 MB = 1,000,000 bytes. For otherwise valid files: ≤10,000,000 HOT; >10,000,000–100,000,000 WARM; >100,000,000–250,000,000 COLD; larger files rejected. The separate record limit is binary 4 MiB. No storage-tier routing is added here. |
+| A9 | Use the approved CsvProbeRunner, CsvParserAdapter, and ParserSession interfaces. Adapters borrow a Reader; there is no shared UTF-16-to-source-byte mapping or second CSV tokenizer. Unsupported/unverified capabilities cannot be credited as passing protection. |
+| A10 | Checkpoint 2A implements only shared contracts/runner, a test-only scripted adapter, focused small JUnit tests, and documentation. Real adapters, parser dependencies, real-parser conformance evidence, and large generated experiments remain deferred. |
+
+These approvals settle policy, not the final production tuning or the libraries'
+ability to enforce it. The source-byte and code-point safety candidates remain
+subject to experiments rather than being declared proven production defaults.
+
+### Current interfaces and experiment-only issue codes
+
+`CsvProbeRunner.run(ProbeInput, ProbeLimits, CsvParserAdapter, RecordSink)` returns
+`ProbeResult` or throws typed operational/unsupported exceptions. An adapter exposes
+identity/capabilities and opens a `ParserSession` over a borrowed `Reader`.
+`ParserSession.next()` returns a tokenized record, a blank signal, or end-of-input,
+and can report malformed input through `CsvRejectionException`.
+
+The approved codes are `MISSING_HEADER`, `INVALID_HEADER`, `DUPLICATE_HEADER`,
+`COLUMN_COUNT_MISMATCH`, `MALFORMED_UTF8`, `MALFORMED_CSV`,
+`FIELD_CODE_POINT_LIMIT_EXCEEDED`, `RECORD_SOURCE_BYTE_LIMIT_EXCEEDED`,
+`COLUMN_LIMIT_EXCEEDED`, and `NO_DATA_RECORDS`.
+During Checkpoint 2A implementation the owner additionally approved
+`INPUT_BYTE_LIMIT_EXCEEDED` for the shared whole-file byte-budget guard.
+These codes are experiment-only; no additional production code inventory is inferred.
+
+### Implemented behavior and limitations, reviewed for Checkpoint 2A
+
+- `SharedCsvProbeRunner` opens a fresh source, counts original bytes (including BOM,
+  separators and blanks), uses a reporting UTF-8 decoder, and strips only an initial
+  UTF-8 BOM from the reader's character view. Original source bytes are never rewritten.
+- A close-shield protects the runner-owned reader from adapter closes. Session
+  cleanup precedes closing the reader/source chain, or the partially constructed
+  input chain if opening fails. All closes are attempted. Operational failures
+  remain primary with cleanup failures suppressed. Recoverable content diagnostics
+  do not become fatal exceptions: absent a primary operational or fatal content
+  failure, Stage.CLEANUP identifies the actual first cleanup exception as its cause,
+  with later cleanup exceptions suppressed. Cleanup after fatal content rejection
+  retains the fatal content failure as its cause and suppresses all cleanup failures.
+- Shared normalization, duplicate detection, width checks and ordinal assignment
+  are implemented. Empty normalized header names are not newly forbidden. An
+  impossible nonblank zero-field header signal is INVALID_HEADER. Further header
+  restrictions require an explicit approved policy.
+- Diagnostic count and fixed message storage are bounded. Errors precede retained
+  warnings; earlier errors are retained and a new error can evict the latest retained
+  warning. A zero issue budget is supported: outcome still reflects observed errors,
+  and observing an omitted issue sets truncation. Fatal rejection alone does not.
+- The whole-file byte guard uses bounded reads, observing at most one byte beyond
+  the configured inclusive maximum before rejecting. Small custom limits test the
+  guard; no 10 MB, 100 MB, or 250 MB artifacts are generated. Configurable experiment
+  limits are not a production upload configuration or tier router.
+- Parsed-field code-point and column checks operate on already-materialized records.
+  They verify semantics only. Early field, column and logical-record byte protection
+  remain UNVERIFIED unless an adapter supplies evidence. There is no shared logical
+  record source-byte accounting, guessed offset, or tokenizer.
+- On session end-of-input the runner finishes strict decoding and whole-file budget
+  verification. Unread decoded characters cause an ADAPTER_READ operational contract
+  violation, not VALID/INVALID CSV. Source I/O, malformed UTF-8 and byte-budget
+  failures discovered during verification take priority. No tail is tokenized.
+  Parser-owned internal buffering remains invisible to this reader-level check and
+  requires real-adapter conformance tests. Fatal content rejection does not drain.
+- `SyntheticParserAdapter` exists only under test sources. It scripts events and can
+  consume the supplied reader without parsing it. Its successful VALID results prove
+  shared behavior only, never real quoting, quote-unescaping, newline interpretation,
+  blank-line recognition, or native allocation safety.
+- CapabilityStatus is SUPPORTED, UNSUPPORTED or UNVERIFIED; it has no PASS value.
+  SUPPORTED describes a declared mechanism/evidence, not an executed conformance test.
+  Future case reporting distinguishes PASS, FAIL, UNSUPPORTED, DEFERRED and ABORTED;
+  a full conformance ledger, worker-JVM budgets and real-adapter acceptance gate are
+  not implemented in this checkpoint. Missing protection cannot count as PASS.
+
+## Current review gate
+
+The revised Checkpoint 2A implementation is approved for commit and push. Verify the
+pushed commit on GitHub before creating a PR; merging is not authorized by this approval.
+Keep the experiment independent of production modules. Do not add uniVocity/FastCSV
+dependencies or adapters, choose a production parser, or claim the experiment is complete.
+Remaining questions are original-record completeness, unspecified production diagnostic
+conventions, additional header-name restrictions, and real-adapter compatibility and
+early-enforcement evidence; the three measurement/unit policies above are resolved.
