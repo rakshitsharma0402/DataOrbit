@@ -1,0 +1,4 @@
+# Preserve exact bytes for parser fixtures: CR, LF, CRLF, mixed endings,
+# and missing final newlines. Apply to CSV/TSV files at every directory depth.
+*.csv -text
+*.tsv -text

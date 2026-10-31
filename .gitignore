@@ -1,0 +1,95 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100/
+.Trashes/
+
+# IDEs and editors
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+*.code-workspace
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+!**/.mvn/wrapper/maven-wrapper.jar
+.classpath
+.project
+.settings/
+
+# React / TypeScript
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Environment configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# DataOrbit local storage
+dataorbit-data/
+pgdata/
+postgres-data/
+db-dumps/
+/dumps/
+/backups/
+
+# Local datasets and database files
+*.csv
+*.tsv
+*.parquet
+*.avro
+*.xlsx
+*.xls
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.mv.db
+*.trace.db
+
+# Database exports
+*.dump
+*.backup
+*.dump.sql
+*_dump.sql
+*.sql.gz
+*.sql.zip
+*.sql.bz2
+*.sql.xz
+
+# Keep small synthetic CSV/TSV test fixtures trackable.
+!**/src/test/resources/**/*.csv
+!**/src/test/resources/**/*.tsv
+!**/test/fixtures/**/*.csv
+!**/test/fixtures/**/*.tsv
+!**/tests/fixtures/**/*.csv
+!**/tests/fixtures/**/*.tsv
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Logs and generated experiment files
+*.log
+experiments/**/generated/
