@@ -65,19 +65,51 @@ Details and acceptance evidence: [`docs/planning/milestones.md`](docs/planning/m
 
 ## Getting started
 
-Prepare your machine with [`docs/setup.md`](docs/setup.md) (JDK 25, Maven, Node, PostgreSQL). The full getting-started guide arrives as Milestone 1 completes; for now the backend can be built and started on its own:
+DataOrbit runs entirely on your own machine: a Spring Boot backend on `127.0.0.1:8080`, a React frontend on `127.0.0.1:5173` and a local PostgreSQL database. Nothing listens on your network.
+
+### 1. Prepare your machine (once)
+
+Follow [`docs/setup.md`](docs/setup.md):
+
+- Install JDK 25, Maven 3.9+, Node.js 22.12+ (24 recommended), PostgreSQL and Git.
+- Create the `dataorbit` role and the `dataorbit` and `dataorbit_test` databases.
+- Export the database password in your shell (never commit it):
+
+```bash
+export DATAORBIT_DB_PASSWORD='<your password>'
+```
+
+### 2. Build and test the backend
+
+From the repository root:
 
 ```bash
 mvn -f backend/pom.xml verify
 ```
 
+This builds all nine modules, checks the module dependency rules and runs the backend tests against `dataorbit_test`. It produces the executable jar.
+
+### 3. Start the backend
+
 ```bash
 java -jar backend/dataorbit-app/target/dataorbit-app-0.1.0-SNAPSHOT.jar
 ```
 
-Both need local PostgreSQL with the `dataorbit` and `dataorbit_test` databases, and the backend needs `DATAORBIT_DB_PASSWORD` set ([setup guide](docs/setup.md#credentials-for-the-backend)). On startup Flyway applies any pending migrations. The backend listens only on `127.0.0.1:8080`. `GET /api/v1/version` returns `{"name":"DataOrbit","version":"0.1.0-SNAPSHOT"}`.
+On startup the backend checks its settings, then Flyway applies any pending database migrations. If a setting is missing or invalid (for example `DATAORBIT_DB_PASSWORD`), it stops with a short "APPLICATION FAILED TO START" report naming the setting. Check that it is up:
 
-With the backend running, start the frontend in a second terminal and open `http://127.0.0.1:5173`; the page shows the backend version:
+```bash
+curl http://127.0.0.1:8080/api/v1/version
+```
+
+It answers `{"name":"DataOrbit","version":"0.1.0-SNAPSHOT"}`. To see the applied migrations:
+
+```bash
+psql -h 127.0.0.1 -U dataorbit -d dataorbit -c 'select version, description, success from flyway_schema_history;'
+```
+
+### 4. Start the frontend
+
+In a second terminal, install the exact dependency versions from the lockfile, then start the dev server:
 
 ```bash
 npm --prefix frontend ci
@@ -86,6 +118,44 @@ npm --prefix frontend ci
 ```bash
 npm --prefix frontend run dev
 ```
+
+Open `http://127.0.0.1:5173`. The page shows "Connected to DataOrbit version 0.1.0-SNAPSHOT". If the backend is not running, it says it cannot reach the backend and offers **Try again**.
+
+### 5. Check the frontend
+
+These are the same checks CI runs:
+
+```bash
+npm --prefix frontend run typecheck
+```
+
+```bash
+npm --prefix frontend run lint
+```
+
+```bash
+npm --prefix frontend test
+```
+
+```bash
+npm --prefix frontend run build
+```
+
+### Settings
+
+Defaults live in `backend/dataorbit-app/src/main/resources/application.yml`. Override any of them with an environment variable or a command-line argument, for example `--server.port=9090`.
+
+| Setting | Default | Rule |
+|---|---|---|
+| `server.address` | `127.0.0.1` | Required; must be a literal loopback IP |
+| `server.port` | `8080` | |
+| `spring.datasource.url` | `jdbc:postgresql://127.0.0.1:5432/dataorbit` | |
+| `spring.datasource.password` | from `DATAORBIT_DB_PASSWORD` | Required; no default |
+| `dataorbit.frontend-origin` | `http://127.0.0.1:5173` | Required; the only browser origin the API accepts |
+
+### Continuous integration
+
+Every pull request and every push to `main` runs the `backend` and `frontend` jobs in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Both must pass before a pull request can merge into `main`.
 
 ## Documentation
 

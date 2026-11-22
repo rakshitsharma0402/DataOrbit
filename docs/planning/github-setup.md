@@ -2,6 +2,20 @@
 
 One-time setup for `rakshitsharma0402/DataOrbit`, following the [GitHub Engineering Standard](../engineering/GitHub-Engineering-Standard-v1.0.md). Run from a clone of the repository with the GitHub CLI authenticated (`gh auth status`).
 
+## Status (23 November 2026)
+
+| Step | State |
+|---|---|
+| 1. Initial commit | Done (`bbe4659`) |
+| 2. Labels, milestones, merge settings | Done (bootstrap script; the leftover default `accessibility` label was also deleted) |
+| 3. Issues | Milestone 1 issues #1 to #7 created |
+| 4. CI | Done: `.github/workflows/ci.yml`, jobs `backend` and `frontend` |
+| 5. Protect `main` | Done: rulesets "main – safety" and "main – required checks" |
+| 6. Tag protection | Done: ruleset "tags – releases" |
+| Secret scanning and push protection | Enabled |
+| Dependabot alerts | Not enabled |
+| 7. GitHub Project | Not created yet |
+
 ## 1. Initial commit
 
 Apply the docs pack to an empty repository and commit it directly to `main` (the initial documentation commit is the one exception to the PR rule):
@@ -32,18 +46,22 @@ Create the first workflows (Milestone 1, issue 6). Required status checks can on
 
 ## 5. Protect `main`
 
-Settings, Rules, Rulesets, new branch ruleset targeting `main`:
+Settings, Rules, Rulesets. Use **two** branch rulesets targeting the default branch, because a bypass actor skips every rule in a ruleset: with one ruleset, the admin bypass needed for direct documentation commits would also allow force pushes.
 
-- Block force pushes and block deletion.
-- Require status checks to pass: the backend and frontend CI jobs.
-- Do **not** require approvals (single maintainer).
-- Add yourself (repository admin) as a bypass actor, so trivial documentation commits can still go straight to `main` as the standard allows. Required checks otherwise block any direct push.
+| Ruleset | Rules | Bypass |
+|---|---|---|
+| main – safety | Block force pushes; block deletion | None |
+| main – required checks | Require status checks `backend` and `frontend` (GitHub Actions); branch need not be up to date | Repository admin, always |
+
+- Do **not** require approvals or pull requests (single maintainer).
+- The admin bypass lets trivial documentation commits go straight to `main`, as the standard allows. Required checks otherwise block any direct push.
+- Renaming a CI job means updating "main – required checks" too.
 
 Also enable secret scanning and Dependabot alerts, if your plan includes them.
 
 ## 6. Tag protection
 
-Add a tag ruleset for `v*` that blocks deletion and updates, so published tags stay immutable.
+Ruleset "tags – releases" targets `refs/tags/v*` and blocks deletion, updates and force updates, so published tags stay immutable. No bypass.
 
 ## 7. GitHub Project: `DataOrbit V1 Development`
 
