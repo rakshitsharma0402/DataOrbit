@@ -75,7 +75,7 @@ mvn -f backend/pom.xml verify
 java -jar backend/dataorbit-app/target/dataorbit-app-0.1.0-SNAPSHOT.jar
 ```
 
-The backend listens only on `127.0.0.1:8080`. `GET /api/v1/version` returns `{"name":"DataOrbit","version":"0.1.0-SNAPSHOT"}`.
+Both need local PostgreSQL with the `dataorbit` and `dataorbit_test` databases, and the backend needs `DATAORBIT_DB_PASSWORD` set ([setup guide](docs/setup.md#credentials-for-the-backend)). On startup Flyway applies any pending migrations. The backend listens only on `127.0.0.1:8080`. `GET /api/v1/version` returns `{"name":"DataOrbit","version":"0.1.0-SNAPSHOT"}`.
 
 ## Documentation
 

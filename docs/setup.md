@@ -57,18 +57,42 @@ DataOrbit uses one local database owned by a dedicated, non-superuser login role
    psql -d postgres -c "CREATE DATABASE dataorbit OWNER dataorbit ENCODING 'UTF8' TEMPLATE template0;"
    ```
 
+   The automated tests use a separate database, so they never touch your development data:
+
+   ```bash
+   psql -d postgres -c "CREATE DATABASE dataorbit_test OWNER dataorbit ENCODING 'UTF8' TEMPLATE template0;"
+   ```
+
 3. Set the role's password interactively, so it never appears in shell history or in the repository:
 
    ```bash
    psql -d postgres -c '\password dataorbit'
    ```
 
-4. Check that you can connect as the new role (it prompts for the password):
+4. Check that you can connect as the new role:
 
    ```bash
-   psql -h localhost -U dataorbit -d dataorbit -c 'select current_user, current_database();'
+   psql -h 127.0.0.1 -U dataorbit -d dataorbit -c 'select current_user, current_database();'
    ```
 
-### Credentials
+### Password authentication
 
-Never commit the password or a real connection string. The backend reads its database settings from configuration and environment variables. The exact setting names are defined with the Spring Boot configuration and the Flyway connection work in Milestone 1. Keep real values in local, untracked files or in your shell environment only.
+Homebrew's default `pg_hba.conf` uses `trust` for local connections: PostgreSQL then accepts any password, or none, for any role from this machine. That is acceptable only because the server listens on `localhost` alone. To make PostgreSQL check the password, change `trust` to `scram-sha-256` on the `local` and `host` lines of `pg_hba.conf` (Homebrew: `/opt/homebrew/var/postgresql@18/pg_hba.conf`), then restart:
+
+```bash
+brew services restart postgresql@18
+```
+
+Keep at least one way to connect as your admin user before you change it.
+
+### Credentials for the backend
+
+The backend connects to `jdbc:postgresql://127.0.0.1:5432/dataorbit` as `dataorbit` and reads the password from the `DATAORBIT_DB_PASSWORD` environment variable. Startup fails if it is not set. Set it in your shell, never in a committed file:
+
+```bash
+export DATAORBIT_DB_PASSWORD='<your password>'
+```
+
+Put that line in your shell profile, or in an untracked `.env` file you `source`; `.env` files are git-ignored. Never commit the password or a real connection string.
+
+The tests use `dataorbit_test` and read the same variable. If it is not set, they fall back to a placeholder that works only while PostgreSQL uses `trust`. Set `DATAORBIT_TEST_DB_URL` to point the tests at a different server.
