@@ -20,7 +20,12 @@ If code, handbook and ADRs disagree, stop and flag it. Do not silently pick one.
 
 ## Commands
 
-None yet. Milestone 1 adds the build, test and run commands here (backend, frontend, local PostgreSQL). Keep this section current.
+Toolchain and local PostgreSQL setup: `docs/setup.md`. Keep this section current as Milestone 1 adds run commands (backend, frontend).
+
+- Backend build and tests (all nine modules, including the dependency-direction check): `mvn -f backend/pom.xml verify`
+- Show the module dependency graph: `mvn -f backend/pom.xml dependency:tree`
+
+Each module's allowed DataOrbit dependencies are an allow-list in its `pom.xml` (`enforce-module-direction`, Maven Enforcer `bannedDependencies`). Change a module's dependencies only together with that allow-list, and only as chapter 05 permits.
 
 ## Architecture invariants (do not violate)
 

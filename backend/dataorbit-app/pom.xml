@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.rakshitsharma0402</groupId>
+        <artifactId>dataorbit-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>dataorbit-app</artifactId>
+    <name>DataOrbit Application</name>
+    <description>Executable entry point, REST adapters, dependency composition and concrete database adapters.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>storage-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>status</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>configuration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>classification</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>storage-local</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ingestion</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>workflow</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              Dependency direction (handbook chapter 05).
+              Allowed DataOrbit modules: storage-api, status, configuration, classification, validation, storage-local, ingestion, workflow.
+              Every other DataOrbit module is banned, directly or transitively, in any scope.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-module-direction</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <message>dataorbit-app may depend only on these DataOrbit modules: storage-api, status, configuration, classification, validation, storage-local, ingestion, workflow. See docs/book/chapters/05-the-modular-monolith-and-its-boundaries.md.</message>
+                                    <excludes>
+                                        <exclude>${project.groupId}:*</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <include>${project.groupId}:storage-api</include>
+                                        <include>${project.groupId}:status</include>
+                                        <include>${project.groupId}:configuration</include>
+                                        <include>${project.groupId}:classification</include>
+                                        <include>${project.groupId}:validation</include>
+                                        <include>${project.groupId}:storage-local</include>
+                                        <include>${project.groupId}:ingestion</include>
+                                        <include>${project.groupId}:workflow</include>
+                                    </includes>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

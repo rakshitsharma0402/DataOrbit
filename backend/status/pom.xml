@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.rakshitsharma0402</groupId>
+        <artifactId>dataorbit-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>status</artifactId>
+    <name>DataOrbit Status</name>
+    <description>Operational persistence contracts, jobs, events and tasks, read-only status.</description>
+
+    <build>
+        <plugins>
+            <!--
+              Dependency direction (handbook chapter 05).
+              Allowed DataOrbit modules: none (foundational module).
+              Every other DataOrbit module is banned, directly or transitively, in any scope.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-module-direction</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <message>status may depend only on these DataOrbit modules: none (foundational module). See docs/book/chapters/05-the-modular-monolith-and-its-boundaries.md.</message>
+                                    <excludes>
+                                        <exclude>${project.groupId}:*</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

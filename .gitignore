@@ -1,0 +1,18 @@
+# Maven build output
+target/
+
+# IDE and editor files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+
+# Local, untracked configuration (real credentials never go in the repository)
+.env
+.env.*
+!.env.example

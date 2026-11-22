@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.rakshitsharma0402</groupId>
+        <artifactId>dataorbit-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>classification</artifactId>
+    <name>DataOrbit Classification</name>
+    <description>Pure tier choice for size and immutable policy.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>storage-api</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              Dependency direction (handbook chapter 05).
+              Allowed DataOrbit modules: storage-api.
+              Every other DataOrbit module is banned, directly or transitively, in any scope.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-module-direction</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <message>classification may depend only on these DataOrbit modules: storage-api. See docs/book/chapters/05-the-modular-monolith-and-its-boundaries.md.</message>
+                                    <excludes>
+                                        <exclude>${project.groupId}:*</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <include>${project.groupId}:storage-api</include>
+                                    </includes>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
