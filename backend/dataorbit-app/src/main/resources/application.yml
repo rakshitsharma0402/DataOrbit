@@ -1,0 +1,16 @@
+# DataOrbit backend defaults for local development.
+# Real credentials never go in this file. Override settings with environment variables
+# (for example SERVER_PORT=9090 or DATAORBIT_FRONTEND_ORIGIN=http://localhost:3000).
+
+spring:
+  application:
+    name: dataorbit
+
+server:
+  # Required, and must be a literal loopback IP (handbook chapter 17). Startup fails otherwise.
+  address: 127.0.0.1
+  port: 8080
+
+dataorbit:
+  # Required. The one browser origin allowed to call the API (used for CORS in the frontend issue).
+  frontend-origin: http://localhost:5173

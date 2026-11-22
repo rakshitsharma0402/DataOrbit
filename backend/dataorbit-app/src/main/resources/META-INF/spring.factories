@@ -1,0 +1,2 @@
+org.springframework.boot.diagnostics.FailureAnalyzer=\
+io.github.rakshitsharma0402.dataorbit.app.InvalidStartupSettingFailureAnalyzer
