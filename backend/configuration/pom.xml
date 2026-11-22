@@ -14,6 +14,20 @@
     <name>DataOrbit Configuration</name>
     <description>Startup settings and immutable classification-policy persistence.</description>
 
+    <dependencies>
+        <!-- @ConfigurationProperties only; no web or auto-configuration. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <!--
