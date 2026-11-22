@@ -65,7 +65,17 @@ Details and acceptance evidence: [`docs/planning/milestones.md`](docs/planning/m
 
 ## Getting started
 
-Build, run and test instructions will be added in Milestone 1, once there is something to run.
+Prepare your machine with [`docs/setup.md`](docs/setup.md) (JDK 25, Maven, Node, PostgreSQL). The full getting-started guide arrives as Milestone 1 completes; for now the backend can be built and started on its own:
+
+```bash
+mvn -f backend/pom.xml verify
+```
+
+```bash
+java -jar backend/dataorbit-app/target/dataorbit-app-0.1.0-SNAPSHOT.jar
+```
+
+The backend listens only on `127.0.0.1:8080`. `GET /api/v1/version` returns `{"name":"DataOrbit","version":"0.1.0-SNAPSHOT"}`.
 
 ## Documentation
 
