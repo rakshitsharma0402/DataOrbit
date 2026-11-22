@@ -5,7 +5,7 @@ Proposed issues for each milestone, to be created with `gh issue create` using t
 ## Milestone 1: Project Foundation
 
 1. **[TASK] Verify the development toolchain and document versions** (`component: app`)
-   - [ ] JDK 21, Maven, Node/npm, PostgreSQL and Git versions recorded in `docs/setup.md`
+   - [ ] JDK 25 ([ADR-0006](../adr/0006-java-25-baseline.md)), Maven, Node/npm, PostgreSQL and Git versions recorded in `docs/setup.md`
    - [ ] Local PostgreSQL database and role created, with no secrets committed
 2. **[TASK] Create the parent Maven project with the nine modules** (`component: app`)
    - [ ] Exactly the nine approved modules, single `${revision}` version property

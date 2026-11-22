@@ -31,7 +31,7 @@ One Spring Boot backend (a modular monolith of nine Maven modules), one React ap
 | `status` | Operational persistence contracts, jobs, events, tasks, read-only status |
 | `configuration` | Validated startup settings and immutable policy revisions |
 
-**Stack:** Java 21, Spring Boot, Maven, PostgreSQL, Flyway, React, TypeScript, React Flow.
+**Stack:** Java 25 ([ADR-0006](docs/adr/0006-java-25-baseline.md)), Spring Boot, Maven, PostgreSQL, Flyway, React, TypeScript, React Flow.
 
 ## Repository layout
 

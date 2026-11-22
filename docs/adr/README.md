@@ -11,6 +11,7 @@ ADRs record decisions made while implementing DataOrbit. They are numbered, shor
 | [0003](0003-upload-attempt-attribution-in-object-key.md) | Upload attempt attribution through the object key | Accepted |
 | [0004](0004-csv-parser-selection-deferred-to-milestone-3.md) | CSV parser selection deferred to Milestone 3 | Accepted (decision deferred) |
 | [0005](0005-versioning-and-release-mapping.md) | Versioning and release mapping | Accepted |
+| [0006](0006-java-25-baseline.md) | Java 25 as the development baseline | Accepted |
 
 ## Template
 

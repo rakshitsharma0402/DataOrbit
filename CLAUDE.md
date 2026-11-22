@@ -12,7 +12,7 @@ DataOrbit V1: a local, single-user CSV ingestion, validation and tiered-storage 
    - Read the Markdown chapters in `docs/book/chapters/`, not the PDF. `docs/book/README.md` has a "which chapter for which work" table: before starting work on a component, read its chapter there.
    - Open `docs/book/DataOrbit-V1-Handbook.pdf` only to look at a diagram (each figure in the Markdown gives its PDF page) or to settle a doubt. The PDF is authoritative if the two disagree.
    - Do not load the whole handbook at once, and do not `@`-import it into this file.
-2. `docs/adr/` — implementation-time decisions (JdbcClient + Flyway, advisory-lock ownership, attempt ID in object keys, parser deferred, versioning).
+2. `docs/adr/` — implementation-time decisions (JdbcClient + Flyway, advisory-lock ownership, attempt ID in object keys, parser deferred, versioning, Java 25 baseline).
 3. `docs/engineering/GitHub-Engineering-Standard-v1.0.md` — workflow rules.
 4. `docs/planning/` — milestones and backlog.
 
