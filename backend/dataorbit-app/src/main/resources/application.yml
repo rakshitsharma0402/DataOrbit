@@ -6,6 +6,19 @@ spring:
   application:
     name: dataorbit
 
+  # Local PostgreSQL (docs/setup.md). The password has no default on purpose: set
+  # DATAORBIT_DB_PASSWORD in your shell, or startup fails.
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/dataorbit
+    username: dataorbit
+    password: ${DATAORBIT_DB_PASSWORD}
+
+  # Flyway owns the schema (ADR-0001). It applies classpath:db/migration on startup; a failed
+  # migration stops startup. Never clean a real database.
+  flyway:
+    clean-disabled: true
+    validate-migration-naming: true
+
 server:
   # Required, and must be a literal loopback IP (handbook chapter 17). Startup fails otherwise.
   address: 127.0.0.1

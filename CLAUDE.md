@@ -24,6 +24,8 @@ Toolchain and local PostgreSQL setup: `docs/setup.md`. Keep this section current
 
 - Backend build and tests (all nine modules, including the dependency-direction check): `mvn -f backend/pom.xml verify`
 - Show the module dependency graph: `mvn -f backend/pom.xml dependency:tree`
+- Database: local PostgreSQL, `dataorbit` (development) and `dataorbit_test` (tests), both owned by role `dataorbit`. The backend needs `DATAORBIT_DB_PASSWORD` set or startup fails. Tests that need an empty database use `TemporarySchema` (a throwaway schema, dropped afterwards); never point a test at the development database.
+- Migrations: `backend/dataorbit-app/src/main/resources/db/migration/V<n>__<description>.sql`. Never edit a merged migration; add a new version. JPA/Hibernate and jOOQ are banned by the build (ADR-0001).
 - Run the backend (after `mvn -f backend/pom.xml package`): `java -jar backend/dataorbit-app/target/dataorbit-app-0.1.0-SNAPSHOT.jar`. It listens on `http://127.0.0.1:8080`; check it with `curl http://127.0.0.1:8080/api/v1/version`.
 - Startup settings: `backend/dataorbit-app/src/main/resources/application.yml`. `server.address` must be a literal loopback IP and `dataorbit.frontend-origin` a loopback http(s) origin, or startup fails. Override with environment variables or `--name=value` arguments, never by committing real credentials.
 - In tests that start the application with custom settings, pass them as command-line arguments (`SpringApplicationBuilder.run("--name=value")`). `SpringApplicationBuilder.properties(...)` only sets defaults, which `application.yml` overrides.

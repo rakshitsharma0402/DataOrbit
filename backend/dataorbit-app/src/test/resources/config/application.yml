@@ -1,0 +1,14 @@
+# Test-only overrides. Spring Boot loads classpath:config/application.yml after
+# classpath:application.yml, so these values win for every test without a profile.
+#
+# Tests use the separate dataorbit_test database (docs/setup.md), never the dev database.
+# Tests that need an empty database create and drop their own temporary schema.
+spring:
+  datasource:
+    url: ${DATAORBIT_TEST_DB_URL:jdbc:postgresql://127.0.0.1:5432/dataorbit_test}
+    # The real password if DATAORBIT_DB_PASSWORD is set; otherwise a placeholder that only works
+    # while local PostgreSQL uses trust authentication (the Homebrew default).
+    password: ${DATAORBIT_DB_PASSWORD:unset-test-password}
+  flyway:
+    schemas: dataorbit_it
+    default-schema: dataorbit_it

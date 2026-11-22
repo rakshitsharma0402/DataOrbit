@@ -183,6 +183,26 @@
                             </rules>
                         </configuration>
                     </execution>
+                    <!-- ADR-0001: plain SQL with JdbcClient and Flyway; no JPA/Hibernate or jOOQ in V1. -->
+                    <execution>
+                        <id>enforce-persistence-choice</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <message>ADR-0001: DataOrbit V1 uses JdbcClient and Flyway. JPA, Hibernate and jOOQ are not allowed.</message>
+                                    <excludes>
+                                        <exclude>jakarta.persistence:*</exclude>
+                                        <exclude>org.hibernate.orm:*</exclude>
+                                        <exclude>org.springframework.data:spring-data-jpa</exclude>
+                                        <exclude>org.jooq:*</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

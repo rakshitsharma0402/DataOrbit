@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -54,17 +53,7 @@ class StartupSettingsTest {
         assertThat(analysis.getAction()).contains("Fix 'server.address'");
     }
 
-    /**
-     * Starts the application with the given settings as command-line arguments. Those outrank
-     * application.yml, as they would for a real user. ({@code SpringApplicationBuilder.properties}
-     * would set defaults instead, which application.yml silently overrides.)
-     */
     private static ConfigurableApplicationContext start(String... settings) {
-        String[] args = new String[settings.length + 1];
-        args[0] = "--server.port=0";
-        for (int i = 0; i < settings.length; i++) {
-            args[i + 1] = "--" + settings[i];
-        }
-        return new SpringApplicationBuilder(DataOrbitApplication.class).run(args);
+        return TestApplication.start(settings);
     }
 }
