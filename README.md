@@ -77,6 +77,16 @@ java -jar backend/dataorbit-app/target/dataorbit-app-0.1.0-SNAPSHOT.jar
 
 Both need local PostgreSQL with the `dataorbit` and `dataorbit_test` databases, and the backend needs `DATAORBIT_DB_PASSWORD` set ([setup guide](docs/setup.md#credentials-for-the-backend)). On startup Flyway applies any pending migrations. The backend listens only on `127.0.0.1:8080`. `GET /api/v1/version` returns `{"name":"DataOrbit","version":"0.1.0-SNAPSHOT"}`.
 
+With the backend running, start the frontend in a second terminal and open `http://127.0.0.1:5173`; the page shows the backend version:
+
+```bash
+npm --prefix frontend ci
+```
+
+```bash
+npm --prefix frontend run dev
+```
+
 ## Documentation
 
 - [Engineering Handbook](docs/book/README.md): the approved design baseline, as a [PDF](docs/book/DataOrbit-V1-Handbook.pdf) and as [Markdown chapters](docs/book/chapters/)
