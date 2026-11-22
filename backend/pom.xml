@@ -47,6 +47,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <!-- Framework version. Spring Boot 4.2 supports Java 17 to 27. -->
+        <spring-boot.version>4.2.0</spring-boot.version>
+
         <!-- Plugin versions, pinned for reproducible builds. -->
         <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
@@ -59,6 +62,15 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Versions of Spring Boot and every library it manages (imported BOM). -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- Internal modules, so each module can depend on another without repeating the version. -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -140,6 +152,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
